@@ -37,6 +37,12 @@ parser.add_argument('--jirabaseurl', metavar='JIRAURL', type=str,
         default='https://issues.jboss.org/rest/api/2', 
         help='The base URL for jira (default: https://issues.jboss.org/rest/api/2)')
 
+parser.add_argument('--usermapping', metavar='USERMAPPING', type=str,
+        default='{ "rgodfrey" : "robgodfrey", "grs" : "gordonsim" , "lulf" : "ulf.lilleengen", "tkratky" : "tkratky", "ppatierno" : "ppatiern" }', 
+        help='json map of github id to JIRA id')
+parser.add_argument('--jiraadmins', metavar='JIRAADMINS', type=str,
+        default='[ "robgodfrey", "gordonsim" , "ulf.lilleengen" ]', 
+        help='json list of JIRA users who can create issues on behalf of another')
 args = parser.parse_args()
 username = args.user
 
@@ -47,6 +53,8 @@ pw = getpass.getpass()
 
 upwstr = username + ':' + pw
 upwstrenc = b64encode(upwstr.encode('utf-8')).strip().decode('utf-8')
+usermap = json.loads(args.usermapping)
+admins = json.loads(args.jiraadmins)
 
 for issue in args.issuenum:
   url = '%s/repos/%s/issues/%d' % (args.githubbaseurl, args.repo, issue)
@@ -58,6 +66,9 @@ for issue in args.issuenum:
              'issuetype' : { 'name': 'Task' },
              'summary' : '[#%d] : %s' % ( githubIssue['number'], githubIssue['title'] ),
              'description' : 'Created from upstream issue [#%d|%s].' % (githubIssue['number'], githubIssue['html_url'] ) }
+  mappeduser = usermap[ githubIssue[ 'user' ][ 'login' ] ]
+  if username in admins && mappeduser :
+    fields[ 'reporter' ] = { 'name' : mappeduser }
   jira = { 'fields': fields }
   
   posturl = '%s/issue/' % ( args.jirabaseurl )
@@ -71,4 +82,4 @@ for issue in args.issuenum:
   jiraResult  = json.loads(postres)
   
   print 'Created issue: %s' % ( jiraResult['key'] )
-  
+
