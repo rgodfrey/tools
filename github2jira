@@ -67,7 +67,7 @@ for issue in args.issuenum:
              'summary' : '[#%d] : %s' % ( githubIssue['number'], githubIssue['title'] ),
              'description' : 'Created from upstream issue [#%d|%s].' % (githubIssue['number'], githubIssue['html_url'] ) }
   mappeduser = usermap[ githubIssue[ 'user' ][ 'login' ] ]
-  if username in admins && mappeduser :
+  if username in admins and mappeduser :
     fields[ 'reporter' ] = { 'name' : mappeduser }
   jira = { 'fields': fields }
   
@@ -78,8 +78,8 @@ for issue in args.issuenum:
   
   postreq.add_data(json.dumps(jira))
  
-  postres = urllib2.urlopen(postreq).read()
-  jiraResult  = json.loads(postres)
+#  postres = urllib2.urlopen(postreq).read()
+#  jiraResult  = json.loads(postres)
   
-  print 'Created issue: %s' % ( jiraResult['key'] )
+#  print 'Created issue: %s' % ( jiraResult['key'] )
 
