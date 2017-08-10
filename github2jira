@@ -78,8 +78,8 @@ for issue in args.issuenum:
   
   postreq.add_data(json.dumps(jira))
  
-#  postres = urllib2.urlopen(postreq).read()
-#  jiraResult  = json.loads(postres)
+  postres = urllib2.urlopen(postreq).read()
+  jiraResult  = json.loads(postres)
   
-#  print 'Created issue: %s' % ( jiraResult['key'] )
+  print 'Created issue: %s' % ( jiraResult['key'] )
 
