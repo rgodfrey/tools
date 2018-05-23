@@ -38,7 +38,7 @@ parser.add_argument('--jirabaseurl', metavar='JIRAURL', type=str,
         help='The base URL for jira (default: https://issues.jboss.org/rest/api/2)')
 
 parser.add_argument('--usermapping', metavar='USERMAPPING', type=str,
-        default='{ "rgodfrey" : "robgodfrey", "grs" : "gordonsim" , "lulf" : "ulf.lilleengen", "tkratky" : "tkratky", "ppatierno" : "ppatiern", "kornys": "dkornel" }',
+        default='{ "rgodfrey" : "robgodfrey", "grs" : "gordonsim" , "lulf" : "ulf.lilleengen", "tkratky" : "tkratky", "ppatierno" : "ppatiern", "kornys": "dkornel", "k-wall" : "kwall"}',
         help='json map of github id to JIRA id')
 parser.add_argument('--jiraadmins', metavar='JIRAADMINS', type=str,
         default='[ "robgodfrey", "gordonsim" , "ulf.lilleengen" ]', 
