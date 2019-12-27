@@ -34,8 +34,8 @@ parser.add_argument('--githubbaseurl', metavar='GITHUBURL', type=str,
         default='https://api.github.com', 
         help='The base URL for github (default: https://api.github.com)')
 parser.add_argument('--jirabaseurl', metavar='JIRAURL', type=str,
-        default='https://issues.jboss.org/rest/api/2', 
-        help='The base URL for jira (default: https://issues.jboss.org/rest/api/2)')
+        default='https://issues.redhat.com/rest/api/2', 
+        help='The base URL for jira (default: https://issues.redhat.com/rest/api/2)')
 
 parser.add_argument('--usermapping', metavar='USERMAPPING', type=str,
         default='{ "rgodfrey" : "robgodfrey", "grs" : "gordonsim" , "lulf" : "ulf.lilleengen", "tkratky" : "tkratky", "ppatierno" : "ppatiern", "kornys": "dkornel", "k-wall" : "kwall", "RH-sdavey" : "sdavey", "robshelly" : "rshelly", "junezhang" : "zhangjune99", "yih-wang" : "yihwang"  }',
