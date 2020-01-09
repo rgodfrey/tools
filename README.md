@@ -21,4 +21,4 @@ Usage
                             https://api.github.com)
       --jirabaseurl JIRAURL
                             The base URL for jira (default:
-                            https://issues.jboss.org/rest/api/2)
+                            https://issues.redhat.com/rest/api/2)
