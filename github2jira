@@ -76,7 +76,7 @@ for issue in args.issuenum:
   postreq.add_header('Content-Type','application/json')
   postreq.add_header('Authorization', 'Basic ' + upwstrenc)
   
-  postreq.add_data(json.dumps(jira))
+  postreq.data = bytes(json.dumps(jira), "utf-8")
  
   postres = urllib.request.urlopen(postreq).read()
   jiraResult  = json.loads(postres)
