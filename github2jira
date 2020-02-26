@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import getpass
 import json
 import argparse
@@ -47,7 +47,7 @@ args = parser.parse_args()
 username = args.user
 
 if username is None:
-    username = raw_input('Username: ')
+    username = input('Username: ')
 
 pw = getpass.getpass()
 
@@ -58,8 +58,8 @@ admins = json.loads(args.jiraadmins)
 
 for issue in args.issuenum:
   url = '%s/repos/%s/issues/%d' % (args.githubbaseurl, args.repo, issue)
-  req = urllib2.Request(url)
-  res = urllib2.urlopen(req).read()
+  req = urllib.request.Request(url)
+  res = urllib.request.urlopen(req).read()
   githubIssue = json.loads(res)
   
   fields = { 'project' : { 'key': args.project },
@@ -72,14 +72,14 @@ for issue in args.issuenum:
   jira = { 'fields': fields }
   
   posturl = '%s/issue/' % ( args.jirabaseurl )
-  postreq = urllib2.Request(posturl)
+  postreq = urllib.request.Request(posturl)
   postreq.add_header('Content-Type','application/json')
   postreq.add_header('Authorization', 'Basic ' + upwstrenc)
   
   postreq.add_data(json.dumps(jira))
  
-  postres = urllib2.urlopen(postreq).read()
+  postres = urllib.request.urlopen(postreq).read()
   jiraResult  = json.loads(postres)
   
-  print 'Created issue: %s' % ( jiraResult['key'] )
+  print('Created issue: %s' % ( jiraResult['key'] ))
 
