@@ -17,6 +17,7 @@
 import urllib.request, urllib.error, urllib.parse
 import getpass
 import json
+import re
 import argparse
 from base64 import b64encode
 
@@ -40,6 +41,9 @@ parser.add_argument('--jirabaseurl', metavar='JIRAURL', type=str,
 parser.add_argument('--usermapping', metavar='USERMAPPING', type=str,
         default='{ "rgodfrey" : "robgodfrey", "grs" : "gordonsim" , "lulf" : "ulf.lilleengen", "tkratky" : "tkratky", "ppatierno" : "ppatiern", "kornys": "dkornel", "k-wall" : "kwall", "RH-sdavey" : "sdavey", "robshelly" : "rshelly", "junezhang" : "zhangjune99", "yih-wang" : "yihwang", "ctron" : "jreimann-1", "zschwarz" : "zschwarz"}',
         help='json map of github id to JIRA id')
+parser.add_argument('--versionmapping', metavar='VERSIONMAPPING', type=str,
+        default='{}',
+        help='json map of github major.minor milestone to jira major.minor version')
 parser.add_argument('--jiraadmins', metavar='JIRAADMINS', type=str,
         default='[ "robgodfrey", "gordonsim" , "ulf.lilleengen" ]', 
         help='json list of JIRA users who can create issues on behalf of another')
@@ -54,18 +58,48 @@ pw = getpass.getpass()
 upwstr = username + ':' + pw
 upwstrenc = b64encode(upwstr.encode('utf-8')).strip().decode('utf-8')
 usermap = json.loads(args.usermapping)
+versionmap = json.loads(args.versionmapping)
 admins = json.loads(args.jiraadmins)
+
+def milestoneToJiraVersion(milestone):
+    if milestone in versionmap:
+        return versionmap[milestone]
+    else:
+        # Some auto-conversion based on our current versioning rules
+        m = re.search(r"(\d+).(\d+).(\d+)", milestone)
+        if m:
+            major=int(m.group(1))
+            minor=int(m.group(2))
+            micro=int(m.group(3))
+            if major == 0:
+                minor = minor - 27
+            return ("%d.%d.%d") % (major + 1, minor, micro)
+        else:
+            raise ("Unable to map milestone %s to product version" % milestone)
 
 for issue in args.issuenum:
   url = '%s/repos/%s/issues/%d' % (args.githubbaseurl, args.repo, issue)
   req = urllib.request.Request(url)
   res = urllib.request.urlopen(req).read()
   githubIssue = json.loads(res)
+
+  jiraVersion = None
+  if githubIssue["milestone"] != None:
+      jiraVersion = milestoneToJiraVersion(githubIssue["milestone"]["title"])
+
+  jiraIssueType = 'Task'
+  if githubIssue["labels"] != None:
+      for label in githubIssue["labels"]:
+          name = str(label["name"])
+          if name == "kind/bug":
+              jiraIssueType = 'Bug'
+          elif name == "kind/feature":
+              jiraIssueType = 'Enhancement'
   
   fields = { 'project' : { 'key': args.project },
-             'issuetype' : { 'name': 'Task' },
+             'issuetype' : { 'name': jiraIssueType },
              'summary' : '[#%d] : %s' % ( githubIssue['number'], githubIssue['title'] ),
-             'description' : 'Created from upstream issue [#%d|%s].' % (githubIssue['number'], githubIssue['html_url'] ) }
+             'description' : 'Created from upstream issue [#%d|%s]. Fix version: %s' % (githubIssue['number'], githubIssue['html_url'], jiraVersion ) }
   mappeduser = usermap[ githubIssue[ 'user' ][ 'login' ] ]
   if username in admins and mappeduser :
     fields[ 'reporter' ] = { 'name' : mappeduser }
