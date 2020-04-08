@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env
 
 # Copyright 2017 Red Hat Inc.
 #
@@ -39,7 +39,7 @@ parser.add_argument('--jirabaseurl', metavar='JIRAURL', type=str,
         help='The base URL for jira (default: https://issues.redhat.com/rest/api/2)')
 
 parser.add_argument('--usermapping', metavar='USERMAPPING', type=str,
-        default='{ "rgodfrey" : "robgodfrey", "grs" : "gordonsim" , "lulf" : "ulf.lilleengen", "tkratky" : "tkratky", "ppatierno" : "ppatiern", "kornys": "dkornel", "k-wall" : "kwall", "RH-sdavey" : "sdavey", "robshelly" : "rshelly", "junezhang" : "zhangjune99", "yih-wang" : "yihwang", "ctron" : "jreimann-1", "zschwarz" : "zschwarz"}',
+        default='{ "rgodfrey" : "robgodfrey", "grs" : "gordonsim" , "lulf" : "ulf.lilleengen", "tkratky" : "tkratky", "ppatierno" : "ppatiern", "kornys": "dkornel", "k-wall" : "kwall", "RH-sdavey" : "sdavey", "robshelly" : "rshelly", "junezhang" : "zhangjune99", "yih-wang" : "yihwang", "ctron" : "jreimann-1", "zschwarz" : "zschwarz", "hguerrero" : "hguerrer"}',
         help='json map of github id to JIRA id')
 parser.add_argument('--versionmapping', metavar='VERSIONMAPPING', type=str,
         default='{}',
