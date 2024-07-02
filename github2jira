@@ -24,6 +24,7 @@ from base64 import b64encode
 
 parser = argparse.ArgumentParser(description='Convert GitHub issue into JIRA issue')
 
+parser.add_argument('--pat', action='store_true', help='Use JIRA Personal Access Token')
 parser.add_argument('issuenum', metavar='ISSUE', nargs='+', type=int,
         help='The issue number')
 parser.add_argument('--repo', metavar='REPO', type=str,
@@ -40,7 +41,7 @@ parser.add_argument('--jirabaseurl', metavar='JIRAURL', type=str,
         help='The base URL for jira (default: https://issues.redhat.com/rest/api/2)')
 
 parser.add_argument('--usermapping', metavar='USERMAPPING', type=str,
-        default='{ "rgodfrey" : "robgodfrey", "grs" : "gordonsim" , "lulf" : "ulf.lilleengen", "tkratky" : "tkratky", "ppatierno" : "ppatiern", "kornys": "dkornel", "k-wall" : "kwall", "RH-sdavey" : "sdavey", "robshelly" : "rshelly", "junezhang" : "zhangjune99", "yih-wang" : "yihwang", "ctron" : "jreimann-1", "zschwarz" : "zschwarz", "hguerrero" : "hguerrer"}',
+        default='{ "rgodfrey" : "robgodfrey", "grs" : "gordonsim" , "lulf" : "ulf.lilleengen", "tkratky" : "tkratky", "ppatierno" : "ppatiern", "kornys": "dkornel", "k-wall" : "kwall", "RH-sdavey" : "sdavey", "robshelly" : "rshelly", "junezhang" : "zhangjune99", "yih-wang" : "yihwang", "ctron" : "jreimann-1", "zschwarz" : "zschwarz", "hguerrero" : "hguerrer", "vbusch" : "vbusch", "fgiorgetti" : "fgiorget"}',
         help='json map of github id to JIRA id')
 parser.add_argument('--versionmapping', metavar='VERSIONMAPPING', type=str,
         default='{}',
@@ -50,14 +51,19 @@ parser.add_argument('--jiraadmins', metavar='JIRAADMINS', type=str,
         help='json list of JIRA users who can create issues on behalf of another')
 args = parser.parse_args()
 username = args.user
+pat = args.pat
 
-if username is None:
+if username is None and not pat:
     username = input('Username: ')
 
 pw = getpass.getpass()
 
-upwstr = username + ':' + pw
-upwstrenc = b64encode(upwstr.encode('utf-8')).strip().decode('utf-8')
+if not pat:
+  upwstr = username + ':' + pw
+  upwstrenc = "Basic " + b64encode(upwstr.encode('utf-8')).strip().decode('utf-8')
+else:
+  upwstrenc = "Bearer " + pw
+
 usermap = json.loads(args.usermapping)
 versionmap = json.loads(args.versionmapping)
 admins = json.loads(args.jiraadmins)
@@ -109,11 +115,12 @@ for issue in args.issuenum:
   posturl = '%s/issue/' % ( args.jirabaseurl )
   postreq = urllib.request.Request(posturl)
   postreq.add_header('Content-Type','application/json')
-  postreq.add_header('Authorization', 'Basic ' + upwstrenc)
+  postreq.add_header('Authorization', upwstrenc)
   
   postreq.data = bytes(json.dumps(jira), "utf-8")
  
   postres = urllib.request.urlopen(postreq).read()
+
   jiraResult  = json.loads(postres)
   
   print('Created issue: %s' % ( jiraResult['key'] ))
